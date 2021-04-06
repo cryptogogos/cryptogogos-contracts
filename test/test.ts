@@ -51,4 +51,22 @@ describe("Test Token Converting", function () {
       initialBalance.add(amount).eq(afterBalance.add(block.gasUsed.mul(100)))
     ).to.be.true;
   });
+  it("Get NFT pack price and mint pack", async function () {
+    const ownerAdd = await owner.getAddress();
+    const value = await cryptoGogo.getNFTPackPrice();
+    await cryptoGogo.mintPack(
+      [
+        "https://test.com/add/1",
+        "https://test.com/add/2",
+        "https://test.com/add/3",
+      ],
+      { value: value }
+    );
+    expect(await cryptoGogo.ownerOf(1)).to.equal(ownerAdd);
+    expect(await cryptoGogo.ownerOf(2)).to.equal(ownerAdd);
+    expect(await cryptoGogo.ownerOf(3)).to.equal(ownerAdd);
+    expect(await cryptoGogo.tokenURI(1)).to.equal("https://test.com/add/1");
+    expect(await cryptoGogo.tokenURI(2)).to.equal("https://test.com/add/2");
+    expect(await cryptoGogo.tokenURI(3)).to.equal("https://test.com/add/3");
+  });
 });

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -8,10 +9,30 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract CryptoGogos is ERC721, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds; //Counter is a struct in the Counters library
+    using SafeMath for uint256;
 
     uint256 private constant maxSupply = 7777;
 
+    uint256 private maxSalePrice = 1 ether;
+
     constructor() public ERC721("GOGOS", "GOG") {}
+
+    /**
+     * @dev Gets current gogo Pack Price
+     */
+    function getNFTPackPrice() public view returns (uint256) {
+        uint256 currentSupply = totalSupply();
+
+        if (currentSupply >= 7150) {
+            return maxSalePrice.mul(3 * 83333333).div(100000000);
+        } else if (currentSupply >= 3150) {
+            return 0.55 ether;
+        } else if (currentSupply >= 850) {
+            return 0.4 ether;
+        } else {
+            return 0;
+        }
+    }
 
     /**
      * @dev Gets current gogo Price
@@ -20,10 +41,10 @@ contract CryptoGogos is ERC721, Ownable {
         uint256 currentSupply = totalSupply();
 
         if (currentSupply >= 7150) {
-            return 1 ether;
+            return maxSalePrice;
         } else if (currentSupply >= 3150) {
             return 0.2 ether;
-        } else if (currentSupply >= 650) {
+        } else if (currentSupply >= 850) {
             return 0.15 ether;
         } else if (currentSupply >= 150) {
             return 0.1 ether;
@@ -32,6 +53,13 @@ contract CryptoGogos is ERC721, Ownable {
         } else {
             return 0.05 ether;
         }
+    }
+
+    /**
+     * @dev Gets current gogo Price
+     */
+    function updateMaxPrice(uint256 _price) public onlyOwner {
+        maxSalePrice = _price;
     }
 
     /**
@@ -53,10 +81,8 @@ contract CryptoGogos is ERC721, Ownable {
     }
 
     /*
-        recepient is the address of the person who will receive nft
-        hash is IPFS hash associated with nft
-        metadata is link to json
-    */
+     *  _tokenURI is link to json
+     */
     function mint(string memory _tokenURI) public payable returns (uint256) {
         require(getNFTPrice() == msg.value, "Ether value sent is not correct");
         _tokenIds.increment();
@@ -64,6 +90,30 @@ contract CryptoGogos is ERC721, Ownable {
         require(newItemId <= maxSupply);
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, _tokenURI);
+        return newItemId;
+    }
+
+    /*
+     *  _tokenURIs is a array of links to json
+     */
+    function mintPack(string[] memory _tokenURIs)
+        public
+        payable
+        returns (uint256)
+    {
+        require(totalSupply() >= 850, "Pack is not available now");
+        require(
+            getNFTPackPrice() == msg.value,
+            "Ether value sent is not correct"
+        );
+        uint256 newItemId;
+        for (uint256 i = 0; i < 3; i++) {
+            _tokenIds.increment();
+            newItemId = _tokenIds.current();
+            require(newItemId <= maxSupply);
+            _mint(msg.sender, newItemId);
+            _setTokenURI(newItemId, _tokenURIs[i]);
+        }
         return newItemId;
     }
 
