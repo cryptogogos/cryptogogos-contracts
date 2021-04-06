@@ -47,6 +47,7 @@ contract CryptoGogos is ERC721, Ownable {
     function mintByAdmin(address to, string memory _tokenURI) public onlyOwner {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
+        require(newItemId <= maxSupply);
         _mint(to, newItemId);
         _setTokenURI(newItemId, _tokenURI);
     }
