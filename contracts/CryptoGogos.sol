@@ -85,6 +85,9 @@ contract CryptoGogos is ERC721, Ownable {
      */
     function mint(string memory _tokenURI) public payable returns (uint256) {
         require(getNFTPrice() == msg.value, "Ether value sent is not correct");
+        uint256 currentSupply = totalSupply();
+        if (totalSupply() <= 150 && balanceOf(msg.sender) >= 2) revert();
+        if (totalSupply() <= 300 && balanceOf(msg.sender) >= 4) revert();
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
@@ -106,6 +109,8 @@ contract CryptoGogos is ERC721, Ownable {
             getNFTPackPrice() == msg.value,
             "Ether value sent is not correct"
         );
+        require(_tokenURIs.length == 3, "Token URI length is not correct");
+
         uint256 newItemId;
         for (uint256 i = 0; i < 3; i++) {
             _tokenIds.increment();
