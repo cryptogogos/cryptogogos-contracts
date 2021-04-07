@@ -15,7 +15,9 @@ contract CryptoGogos is ERC721, Ownable {
 
     uint256 private maxSalePrice = 1 ether;
 
-    constructor() public ERC721("GOGOS", "GOG") {}
+    constructor(string memory _baseURI) public ERC721("GOGOS", "GOG") {
+        _setBaseURI(_baseURI);
+    }
 
     /**
      * @dev Gets current gogo Pack Price
@@ -72,18 +74,17 @@ contract CryptoGogos is ERC721, Ownable {
      *
      * - the caller must have the `MINTER_ROLE`.
      */
-    function mintByAdmin(address to, string memory _tokenURI) public onlyOwner {
+    function mintByAdmin(address to) public onlyOwner {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
         _mint(to, newItemId);
-        _setTokenURI(newItemId, _tokenURI);
     }
 
     /*
      *  _tokenURI is link to json
      */
-    function mint(string memory _tokenURI) public payable returns (uint256) {
+    function mint() public payable returns (uint256) {
         require(getNFTPrice() == msg.value, "Ether value sent is not correct");
         uint256 currentSupply = totalSupply();
         if (totalSupply() <= 150 && balanceOf(msg.sender) >= 2) revert();
@@ -92,24 +93,18 @@ contract CryptoGogos is ERC721, Ownable {
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
         _mint(msg.sender, newItemId);
-        _setTokenURI(newItemId, _tokenURI);
         return newItemId;
     }
 
     /*
      *  _tokenURIs is a array of links to json
      */
-    function mintPack(string[] memory _tokenURIs)
-        public
-        payable
-        returns (uint256)
-    {
+    function mintPack() public payable returns (uint256) {
         require(totalSupply() >= 850, "Pack is not available now");
         require(
             getNFTPackPrice() == msg.value,
             "Ether value sent is not correct"
         );
-        require(_tokenURIs.length == 3, "Token URI length is not correct");
 
         uint256 newItemId;
         for (uint256 i = 0; i < 3; i++) {
@@ -117,9 +112,12 @@ contract CryptoGogos is ERC721, Ownable {
             newItemId = _tokenIds.current();
             require(newItemId <= maxSupply);
             _mint(msg.sender, newItemId);
-            _setTokenURI(newItemId, _tokenURIs[i]);
         }
         return newItemId;
+    }
+
+    function updateBaseURI(string memory _baseURI) public onlyOwner {
+        _setBaseURI(_baseURI);
     }
 
     /**
