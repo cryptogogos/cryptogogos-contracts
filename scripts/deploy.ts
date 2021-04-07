@@ -6,7 +6,7 @@ async function main() {
   console.log("Deploying cryptoGogo with address:", deployerAddress);
 
   const cryptoGogoFactory = await ethers.getContractFactory("CryptoGogos");
-  const cryptoGogo = await cryptoGogoFactory.deploy();
+  const cryptoGogo = await cryptoGogoFactory.deploy("https://api.cryptogogos.com/api/metadata/");
 
   await cryptoGogo.deployed();
 

@@ -15,7 +15,9 @@ contract CryptoGogos is ERC721, Ownable {
 
     uint256 private maxSalePrice = 1 ether;
 
-    constructor() public ERC721("GOGOS", "GOG") {}
+    constructor(string memory _tokenURI) public ERC721("GOGOS", "GOG") {
+        _setBaseURI(_tokenURI);
+    }
 
     /**
      * @dev Gets current gogo Pack Price
@@ -72,18 +74,19 @@ contract CryptoGogos is ERC721, Ownable {
      *
      * - the caller must have the `MINTER_ROLE`.
      */
-    function mintByAdmin(address to, string memory _tokenURI) public onlyOwner {
+    function mintByAdmin(address to) public onlyOwner {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
         _mint(to, newItemId);
+        string memory _tokenURI = Concatenate(baseURI(), Strings.toString(newItemId));
         _setTokenURI(newItemId, _tokenURI);
     }
 
     /*
      *  _tokenURI is link to json
      */
-    function mint(string memory _tokenURI) public payable returns (uint256) {
+    function mint() public payable returns (uint256) {
         require(getNFTPrice() == msg.value, "Ether value sent is not correct");
         uint256 currentSupply = totalSupply();
         if (totalSupply() <= 150 && balanceOf(msg.sender) >= 2) revert();
@@ -92,6 +95,7 @@ contract CryptoGogos is ERC721, Ownable {
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
         _mint(msg.sender, newItemId);
+        string memory _tokenURI = Concatenate(baseURI(), Strings.toString(newItemId));
         _setTokenURI(newItemId, _tokenURI);
         return newItemId;
     }
@@ -128,5 +132,25 @@ contract CryptoGogos is ERC721, Ownable {
     function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
         msg.sender.transfer(balance);
+    }
+
+    /**
+    @dev Concate a sttring a and string b
+     */
+    function Concatenate(string memory a, string memory b) public pure returns (string memory concatenatedString) {
+        bytes memory bytesA = bytes(a);
+        bytes memory bytesB = bytes(b);
+        string memory concatenatedAB = new string(bytesA.length + bytesB.length);
+        bytes memory bytesAB = bytes(concatenatedAB);
+        uint concatendatedIndex = 0;
+        uint index = 0;
+        for (index = 0; index < bytesA.length; index++) {
+            bytesAB[concatendatedIndex++] = bytesA[index];
+        }
+        for (index = 0; index < bytesB.length; index++) {
+            bytesAB[concatendatedIndex++] = bytesB[index];
+        }
+        
+      return string(bytesAB);
     }
 }
