@@ -155,4 +155,26 @@ contract CryptoGogos is ERC721Burnable, ERC721Pausable, Ownable {
     ) internal virtual override(ERC721Pausable, ERC721) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
+
+    /**
+     * @dev Triggers stopped state.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     */
+    function pause() public onlyOwner whenNotPaused {
+        _pause();
+    }
+
+    /**
+     * @dev Returns to normal state.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+    function unpause() public onlyOwner whenPaused {
+        _unpause();
+    }
 }
