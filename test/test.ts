@@ -14,7 +14,9 @@ describe("Test Token Converting", function () {
   beforeEach(async function () {
     [owner, account1, account2, account3] = await ethers.getSigners();
     const cryptoGogoFactory = await ethers.getContractFactory("CryptoGogos");
-    cryptoGogo = (await cryptoGogoFactory.deploy()) as CryptoGogos;
+    cryptoGogo = (await cryptoGogoFactory.deploy(
+      "https://test.com/metadata/"
+    )) as CryptoGogos;
   });
   it("Contracts deployed successfully", async function () {
     expect(await cryptoGogo.name()).to.equal("GOGOS");
@@ -22,7 +24,7 @@ describe("Test Token Converting", function () {
   it("Mint succeed", async function () {
     const minterAdd = await account1.getAddress();
     for (let i = 1; i <= 2; i++) {
-      await cryptoGogo.connect(account1).mint(`https://test.com/add/${i}`, {
+      await cryptoGogo.connect(account1).mint({
         value: await cryptoGogo.getNFTPrice(),
       });
     }
@@ -32,7 +34,7 @@ describe("Test Token Converting", function () {
   it("Mint succeed by admin", async function () {
     const ownerAdd = await owner.getAddress();
     for (let i = 1; i <= 100; i++) {
-      await cryptoGogo.mintByAdmin(ownerAdd, `https://test.com/add/${i}`);
+      await cryptoGogo.mintByAdmin(ownerAdd);
     }
     expect(await cryptoGogo.ownerOf(1)).to.equal(ownerAdd);
     expect(await cryptoGogo.ownerOf(2)).to.equal(ownerAdd);
@@ -41,7 +43,7 @@ describe("Test Token Converting", function () {
     let amount = BN.from(0);
     for (let i = 1; i <= 2; i++) {
       amount = amount.add(await cryptoGogo.getNFTPrice());
-      await cryptoGogo.connect(account1).mint(`https://test.com/add/${i}`, {
+      await cryptoGogo.connect(account1).mint({
         value: await cryptoGogo.getNFTPrice(),
       });
     }
@@ -56,14 +58,7 @@ describe("Test Token Converting", function () {
   it("Get NFT pack price and mint pack", async function () {
     const ownerAdd = await owner.getAddress();
     const value = await cryptoGogo.getNFTPackPrice();
-    await cryptoGogo.mintPack(
-      [
-        "https://test.com/add/1",
-        "https://test.com/add/2",
-        "https://test.com/add/3",
-      ],
-      { value: value }
-    );
+    await cryptoGogo.mintPack({ value: value });
     expect(await cryptoGogo.ownerOf(1)).to.equal(ownerAdd);
     expect(await cryptoGogo.ownerOf(2)).to.equal(ownerAdd);
     expect(await cryptoGogo.ownerOf(3)).to.equal(ownerAdd);
@@ -73,14 +68,15 @@ describe("Test Token Converting", function () {
   });
   it("Mint 3 tokens will not work for first 150 tokens", async function () {
     const minterAdd = await account1.getAddress();
-    await cryptoGogo.connect(account1).mint(`https://test.com/add/${1}`, {
+    await cryptoGogo.connect(account1).mint({
       value: await cryptoGogo.getNFTPrice(),
     });
-    await cryptoGogo.connect(account1).mint(`https://test.com/add/${2}`, {
+    await cryptoGogo.connect(account1).mint({
       value: await cryptoGogo.getNFTPrice(),
     });
+    expect(await cryptoGogo.connect(account1).cantMint()).to.be.false;
     await expect(
-      cryptoGogo.connect(account1).mint(`https://test.com/add/${3}`, {
+      cryptoGogo.connect(account1).mint({
         value: await cryptoGogo.getNFTPrice(),
       })
     ).to.be.reverted;

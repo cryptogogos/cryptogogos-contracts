@@ -4,9 +4,10 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Pausable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
 
-contract CryptoGogos is ERC721, Ownable {
+contract CryptoGogos is ERC721Burnable, ERC721Pausable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds; //Counter is a struct in the Counters library
     using SafeMath for uint256;
@@ -60,6 +61,16 @@ contract CryptoGogos is ERC721, Ownable {
     /**
      * @dev Gets current gogo Price
      */
+    function cantMint() public view returns (bool) {
+        uint256 currentSupply = totalSupply();
+        if (currentSupply <= 150 && balanceOf(msg.sender) >= 2) return false;
+        if (currentSupply <= 300 && balanceOf(msg.sender) >= 4) return false;
+        return true;
+    }
+
+    /**
+     * @dev Gets current gogo Price
+     */
     function updateMaxPrice(uint256 _price) public onlyOwner {
         maxSalePrice = _price;
     }
@@ -86,9 +97,10 @@ contract CryptoGogos is ERC721, Ownable {
      */
     function mint() public payable returns (uint256) {
         require(getNFTPrice() == msg.value, "Ether value sent is not correct");
+        require(!paused(), "ERC721Pausable: token mint while paused");
+
         uint256 currentSupply = totalSupply();
-        if (totalSupply() <= 150 && balanceOf(msg.sender) >= 2) revert();
-        if (totalSupply() <= 300 && balanceOf(msg.sender) >= 4) revert();
+        if (!cantMint()) revert();
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
@@ -105,6 +117,7 @@ contract CryptoGogos is ERC721, Ownable {
             getNFTPackPrice() == msg.value,
             "Ether value sent is not correct"
         );
+        require(!paused(), "ERC721Pausable: token mint while paused");
 
         uint256 newItemId;
         for (uint256 i = 0; i < 3; i++) {
@@ -126,5 +139,20 @@ contract CryptoGogos is ERC721, Ownable {
     function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
         msg.sender.transfer(balance);
+    }
+
+    /**
+     * @dev See {ERC721-_beforeTokenTransfer}.
+     *
+     * Requirements:
+     *
+     * - the contract must not be paused.
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721Pausable, ERC721) {
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 }
