@@ -12,9 +12,12 @@ contract CryptoGogos is ERC721Burnable, ERC721Pausable, Ownable {
     Counters.Counter private _tokenIds; //Counter is a struct in the Counters library
     using SafeMath for uint256;
 
-    uint256 private constant maxSupply = 7777;
+    uint256 private maxSupply = 7777;
 
     uint256 private maxSalePrice = 1 ether;
+
+    event MAX_SUPPLY_UPDATED(uint256 maxSupply);
+    event MAX_PRICE_UPDATED(uint256 maxPrice);
 
     constructor(string memory _baseURI) public ERC721("GOGOS", "GOG") {
         _setBaseURI(_baseURI);
@@ -47,11 +50,11 @@ contract CryptoGogos is ERC721Burnable, ERC721Pausable, Ownable {
             return maxSalePrice;
         } else if (currentSupply >= 3150) {
             return 0.2 ether;
-        } else if (currentSupply >= 850) {
+        } else if (currentSupply >= 1150) {
             return 0.15 ether;
-        } else if (currentSupply >= 150) {
+        } else if (currentSupply >= 300) {
             return 0.1 ether;
-        } else if (currentSupply >= 75) {
+        } else if (currentSupply >= 150) {
             return 0.07 ether;
         } else {
             return 0.05 ether;
@@ -73,6 +76,8 @@ contract CryptoGogos is ERC721Burnable, ERC721Pausable, Ownable {
      */
     function updateMaxPrice(uint256 _price) public onlyOwner {
         maxSalePrice = _price;
+
+        emit MAX_PRICE_UPDATED(_price);
     }
 
     /**
@@ -176,5 +181,10 @@ contract CryptoGogos is ERC721Burnable, ERC721Pausable, Ownable {
      */
     function unpause() public onlyOwner whenPaused {
         _unpause();
+    }
+
+    function updateMaxSupply(uint256 _maxSupply) public onlyOwner {
+        maxSupply = _maxSupply;
+        emit MAX_SUPPLY_UPDATED(_maxSupply);
     }
 }

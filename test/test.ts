@@ -83,4 +83,15 @@ describe("Test Token Converting", function () {
     expect(await cryptoGogo.ownerOf(1)).to.equal(minterAdd);
     expect(await cryptoGogo.ownerOf(2)).to.equal(minterAdd);
   });
+  it("Mint tokens and burn totalsupply check", async function () {
+    await cryptoGogo.connect(account1).mint({
+      value: await cryptoGogo.getNFTPrice(),
+    });
+    await cryptoGogo.connect(account1).mint({
+      value: await cryptoGogo.getNFTPrice(),
+    });
+    expect((await cryptoGogo.totalSupply()).toString()).to.eq("2");
+    await cryptoGogo.connect(account1).burn(2);
+    expect((await cryptoGogo.totalSupply()).toString()).to.eq("1");
+  });
 });
