@@ -14,18 +14,6 @@ abstract contract Context {
     }
 }
 
-/**
- * @dev Contract module which provides a basic access control mechanism, where
- * there is an account (an owner) that can be granted exclusive access to
- * specific functions.
- *
- * By default, the owner account will be the one that deploys the contract. This
- * can later be changed with {transferOwnership}.
- *
- * This module is used through inheritance. It will make available the modifier
- * `onlyOwner`, which can be applied to your functions to restrict their use to
- * the owner.
- */
 abstract contract Ownable is Context {
     address private _owner;
 
@@ -84,19 +72,6 @@ abstract contract Ownable is Context {
     }
 }
 
-/**
- * @dev Wrappers over Solidity's arithmetic operations with added overflow
- * checks.
- *
- * Arithmetic operations in Solidity wrap on overflow. This can easily result
- * in bugs, because programmers usually assume that an overflow raises an
- * error, which is the standard behavior in high level programming languages.
- * `SafeMath` restores this intuition by reverting the transaction when an
- * operation overflows.
- *
- * Using this library instead of the unchecked operations eliminates an entire
- * class of bugs, so it's recommended to use it always.
- */
 library SafeMath {
     /**
      * @dev Returns the addition of two unsigned integers, with an overflow flag.
@@ -327,17 +302,6 @@ library SafeMath {
     }
 }
 
-/**
- * @title Counters
- * @author Matt Condon (@shrugs)
- * @dev Provides counters that can only be incremented or decremented by one. This can be used e.g. to track the number
- * of elements in a mapping, issuing ERC721 ids, or counting request ids.
- *
- * Include with `using Counters for Counters.Counter;`
- * Since it is not possible to overflow a 256 bit integer with increments of one, `increment` can skip the {SafeMath}
- * overflow check, thereby saving gas. This does assume however correct usage, in that the underlying `_value` is never
- * directly accessed.
- */
 library Counters {
     using SafeMath for uint256;
 
@@ -362,15 +326,6 @@ library Counters {
     }
 }
 
-/**
- * @dev Interface of the ERC165 standard, as defined in the
- * https://eips.ethereum.org/EIPS/eip-165[EIP].
- *
- * Implementers can declare support of contract interfaces, which can then be
- * queried by others ({ERC165Checker}).
- *
- * For an implementation, see {ERC165}.
- */
 interface IERC165 {
     /**
      * @dev Returns true if this contract implements the interface defined by
@@ -383,9 +338,6 @@ interface IERC165 {
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
 
-/**
- * @dev Required interface of an ERC721 compliant contract.
- */
 interface IERC721 is IERC165 {
     /**
      * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
@@ -538,10 +490,6 @@ interface IERC721 is IERC165 {
     ) external;
 }
 
-/**
- * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
- * @dev See https://eips.ethereum.org/EIPS/eip-721
- */
 interface IERC721Metadata is IERC721 {
     /**
      * @dev Returns the token collection name.
@@ -559,10 +507,6 @@ interface IERC721Metadata is IERC721 {
     function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
-/**
- * @title ERC-721 Non-Fungible Token Standard, optional enumeration extension
- * @dev See https://eips.ethereum.org/EIPS/eip-721
- */
 interface IERC721Enumerable is IERC721 {
     /**
      * @dev Returns the total amount of tokens stored by the contract.
@@ -585,11 +529,6 @@ interface IERC721Enumerable is IERC721 {
     function tokenByIndex(uint256 index) external view returns (uint256);
 }
 
-/**
- * @title ERC721 token receiver interface
- * @dev Interface for any contract that wants to support safeTransfers
- * from ERC721 asset contracts.
- */
 interface IERC721Receiver {
     /**
      * @dev Whenever an {IERC721} `tokenId` token is transferred to this contract via {IERC721-safeTransferFrom}
@@ -608,12 +547,6 @@ interface IERC721Receiver {
     ) external returns (bytes4);
 }
 
-/**
- * @dev Implementation of the {IERC165} interface.
- *
- * Contracts may inherit from this and call {_registerInterface} to declare
- * their support of an interface.
- */
 abstract contract ERC165 is IERC165 {
     /*
      * bytes4(keccak256('supportsInterface(bytes4)')) == 0x01ffc9a7
@@ -663,9 +596,6 @@ abstract contract ERC165 is IERC165 {
     }
 }
 
-/**
- * @dev Collection of functions related to the address type
- */
 library Address {
     /**
      * @dev Returns true if `account` is a contract.
@@ -1231,30 +1161,6 @@ library EnumerableSet {
     }
 }
 
-/**
- * @dev Library for managing an enumerable variant of Solidity's
- * https://solidity.readthedocs.io/en/latest/types.html#mapping-types[`mapping`]
- * type.
- *
- * Maps have the following properties:
- *
- * - Entries are added, removed, and checked for existence in constant time
- * (O(1)).
- * - Entries are enumerated in O(n). No guarantees are made on the ordering.
- *
- * ```
- * contract Example {
- *     // Add the library methods
- *     using EnumerableMap for EnumerableMap.UintToAddressMap;
- *
- *     // Declare a set state variable
- *     EnumerableMap.UintToAddressMap private myMap;
- * }
- * ```
- *
- * As of v3.0.0, only maps of type `uint256 -> address` (`UintToAddressMap`) are
- * supported.
- */
 library EnumerableMap {
     // To implement this library for multiple types with as little code
     // repetition as possible, we write it in terms of a generic Map type with
@@ -1552,9 +1458,6 @@ library EnumerableMap {
     }
 }
 
-/**
- * @dev String operations.
- */
 library Strings {
     /**
      * @dev Converts a `uint256` to its ASCII `string` representation.
@@ -1583,10 +1486,6 @@ library Strings {
     }
 }
 
-/**
- * @title ERC721 Non-Fungible Token Standard basic implementation
- * @dev see https://eips.ethereum.org/EIPS/eip-721
- */
 contract ERC721 is
     Context,
     ERC165,
@@ -2181,16 +2080,134 @@ contract ERC721 is
     ) internal virtual {}
 }
 
-contract CryptoGogos is ERC721, Ownable {
+abstract contract Pausable is Context {
+    /**
+     * @dev Emitted when the pause is triggered by `account`.
+     */
+    event Paused(address account);
+
+    /**
+     * @dev Emitted when the pause is lifted by `account`.
+     */
+    event Unpaused(address account);
+
+    bool private _paused;
+
+    /**
+     * @dev Initializes the contract in unpaused state.
+     */
+    constructor() internal {
+        _paused = false;
+    }
+
+    /**
+     * @dev Returns true if the contract is paused, and false otherwise.
+     */
+    function paused() public view virtual returns (bool) {
+        return _paused;
+    }
+
+    /**
+     * @dev Modifier to make a function callable only when the contract is not paused.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     */
+    modifier whenNotPaused() {
+        require(!paused(), "Pausable: paused");
+        _;
+    }
+
+    /**
+     * @dev Modifier to make a function callable only when the contract is paused.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+    modifier whenPaused() {
+        require(paused(), "Pausable: not paused");
+        _;
+    }
+
+    /**
+     * @dev Triggers stopped state.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     */
+    function _pause() internal virtual whenNotPaused {
+        _paused = true;
+        emit Paused(_msgSender());
+    }
+
+    /**
+     * @dev Returns to normal state.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+    function _unpause() internal virtual whenPaused {
+        _paused = false;
+        emit Unpaused(_msgSender());
+    }
+}
+
+abstract contract ERC721Pausable is ERC721, Pausable {
+    /**
+     * @dev See {ERC721-_beforeTokenTransfer}.
+     *
+     * Requirements:
+     *
+     * - the contract must not be paused.
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override {
+        super._beforeTokenTransfer(from, to, tokenId);
+
+        require(!paused(), "ERC721Pausable: token transfer while paused");
+    }
+}
+
+abstract contract ERC721Burnable is Context, ERC721 {
+    /**
+     * @dev Burns `tokenId`. See {ERC721-_burn}.
+     *
+     * Requirements:
+     *
+     * - The caller must own `tokenId` or be an approved operator.
+     */
+    function burn(uint256 tokenId) public virtual {
+        //solhint-disable-next-line max-line-length
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721Burnable: caller is not owner nor approved"
+        );
+        _burn(tokenId);
+    }
+}
+
+contract CryptoGogos is ERC721Burnable, ERC721Pausable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds; //Counter is a struct in the Counters library
     using SafeMath for uint256;
 
-    uint256 private constant maxSupply = 7777;
+    uint256 private maxSupply = 7777;
 
     uint256 private maxSalePrice = 1 ether;
 
-    constructor() public ERC721("GOGOS", "GOG") {}
+    event MAX_SUPPLY_UPDATED(uint256 maxSupply);
+    event MAX_PRICE_UPDATED(uint256 maxPrice);
+
+    constructor(string memory _baseURI) public ERC721("GOGOS", "GOG") {
+        _setBaseURI(_baseURI);
+    }
 
     /**
      * @dev Gets current gogo Pack Price
@@ -2219,11 +2236,11 @@ contract CryptoGogos is ERC721, Ownable {
             return maxSalePrice;
         } else if (currentSupply >= 3150) {
             return 0.2 ether;
-        } else if (currentSupply >= 850) {
+        } else if (currentSupply >= 1150) {
             return 0.15 ether;
-        } else if (currentSupply >= 150) {
+        } else if (currentSupply >= 300) {
             return 0.1 ether;
-        } else if (currentSupply >= 75) {
+        } else if (currentSupply >= 150) {
             return 0.07 ether;
         } else {
             return 0.05 ether;
@@ -2233,8 +2250,20 @@ contract CryptoGogos is ERC721, Ownable {
     /**
      * @dev Gets current gogo Price
      */
+    function cantMint() public view returns (bool) {
+        uint256 currentSupply = totalSupply();
+        if (currentSupply <= 150 && balanceOf(msg.sender) >= 2) return false;
+        if (currentSupply <= 300 && balanceOf(msg.sender) >= 4) return false;
+        return true;
+    }
+
+    /**
+     * @dev Gets current gogo Price
+     */
     function updateMaxPrice(uint256 _price) public onlyOwner {
         maxSalePrice = _price;
+
+        emit MAX_PRICE_UPDATED(_price);
     }
 
     /**
@@ -2247,44 +2276,39 @@ contract CryptoGogos is ERC721, Ownable {
      *
      * - the caller must have the `MINTER_ROLE`.
      */
-    function mintByAdmin(address to, string memory _tokenURI) public onlyOwner {
+    function mintByAdmin(address to) public onlyOwner {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
         _mint(to, newItemId);
-        _setTokenURI(newItemId, _tokenURI);
     }
 
     /*
      *  _tokenURI is link to json
      */
-    function mint(string memory _tokenURI) public payable returns (uint256) {
+    function mint() public payable returns (uint256) {
         require(getNFTPrice() == msg.value, "Ether value sent is not correct");
+        require(!paused(), "ERC721Pausable: token mint while paused");
+
         uint256 currentSupply = totalSupply();
-        if (totalSupply() <= 150 && balanceOf(msg.sender) >= 2) revert();
-        if (totalSupply() <= 300 && balanceOf(msg.sender) >= 4) revert();
+        if (!cantMint()) revert();
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         require(newItemId <= maxSupply);
         _mint(msg.sender, newItemId);
-        _setTokenURI(newItemId, _tokenURI);
         return newItemId;
     }
 
     /*
      *  _tokenURIs is a array of links to json
      */
-    function mintPack(string[] memory _tokenURIs)
-        public
-        payable
-        returns (uint256)
-    {
+    function mintPack() public payable returns (uint256) {
         require(totalSupply() >= 850, "Pack is not available now");
         require(
             getNFTPackPrice() == msg.value,
             "Ether value sent is not correct"
         );
-        require(_tokenURIs.length == 3, "Token URI length is not correct");
+        require(!paused(), "ERC721Pausable: token mint while paused");
 
         uint256 newItemId;
         for (uint256 i = 0; i < 3; i++) {
@@ -2292,9 +2316,12 @@ contract CryptoGogos is ERC721, Ownable {
             newItemId = _tokenIds.current();
             require(newItemId <= maxSupply);
             _mint(msg.sender, newItemId);
-            _setTokenURI(newItemId, _tokenURIs[i]);
         }
         return newItemId;
+    }
+
+    function updateBaseURI(string memory _baseURI) public onlyOwner {
+        _setBaseURI(_baseURI);
     }
 
     /**
@@ -2303,5 +2330,47 @@ contract CryptoGogos is ERC721, Ownable {
     function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
         msg.sender.transfer(balance);
+    }
+
+    /**
+     * @dev See {ERC721-_beforeTokenTransfer}.
+     *
+     * Requirements:
+     *
+     * - the contract must not be paused.
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721Pausable, ERC721) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev Triggers stopped state.
+     *
+     * Requirements:
+     *
+     * - The contract must not be paused.
+     */
+    function pause() public onlyOwner whenNotPaused {
+        _pause();
+    }
+
+    /**
+     * @dev Returns to normal state.
+     *
+     * Requirements:
+     *
+     * - The contract must be paused.
+     */
+    function unpause() public onlyOwner whenPaused {
+        _unpause();
+    }
+
+    function updateMaxSupply(uint256 _maxSupply) public onlyOwner {
+        maxSupply = _maxSupply;
+        emit MAX_SUPPLY_UPDATED(_maxSupply);
     }
 }
